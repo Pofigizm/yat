@@ -1,12 +1,16 @@
 'use strict';
 
-// pure function 
-var trottle = function(fn, count){
+var trottle,
+  obj,
+  el;
+
+// pure function
+trottle = function(fn, count) {
   var wait = false;
-  return function(){
+  return function() {
     if (wait) return;
     wait = true;
-    setTimeout(function(){
+    setTimeout(function() {
       wait = false;
     }, 1000 / count);
     fn.apply(this, arguments);
@@ -14,12 +18,12 @@ var trottle = function(fn, count){
 };
 
 // test
-var obj = { context: 'obj' }; 
-obj.testFunc = trottle( function(count){
-  console.log( 'Message:', this.context, count );
+obj = {context: 'obj'};
+obj.testFunc = trottle(function(count) {
+  console.log('Message:', this.context, count);
 }, 5);
 
-var el = 0;
-setInterval( function(){
+el = 0;
+setInterval(function() {
   obj.testFunc(el++);
 }, 10);
