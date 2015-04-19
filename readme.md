@@ -1,6 +1,6 @@
 ## Yet another test
 
-### One test
+### Задача 1
 
 #### Условие
 
@@ -10,21 +10,21 @@
 
 #### Решение
 
-    var trottle = function(fn, count){
-      var wait = false;
-      return function(){
-        if (wait) return;
-        wait = true;
-        setTimeout(function(){
-          wait = false;
-        }, 1000 / count);
-        fn.apply(this, arguments);
-      };
+    var trottle = (func, count) => {
+      let wait = false,
+        fn = function() {
+          if (!wait) {
+            wait = true;
+            setTimeout(() => wait = false, 1000 / count);
+            func.apply(this, arguments);
+          }
+        };
+      return fn;
     };
 
 Я сделал допущение что вызывать `не чаще N раз в секудну` равно `не чаще 1 раза в (секунду / N)`, другое имеет мало практического смысла.
 
-### Two test
+### Задача 2
 
 #### Условие
 
@@ -32,19 +32,18 @@
 
 #### Решение
 
-    var getSumIs = function(sum, array){
+    var getSumIs = function fn(sum, array) {
       return array
-        .reduce( function(pe, ce, ix){
-          if (ce > sum)   return pe;
-          if (ce === sum) return pe.concat(ce);
-          return pe.concat(
-            getSumIs( sum - ce, array.slice(++ix) )
-              .map( function(el){
-                return [ce].concat(el);
-              })
-          );
-        }, []);
+        .reduce((res, el, ix) =>
+          el > sum ? res : res.concat(
+            el === sum ? el : (
+              fn(sum - el, array.slice(++ix))
+                .map(inel => [el].concat(inel))
+            )
+        ), []);
     };
+
+Допустим дан такой массив `[5,-4,3,-2,1,0,-1,2,-3,4,-5,5,-4,3,-2,1,0,-1,2,-3,4,-5]`.
 
 Работа функции на входном масиве без предварительной обработки:
 
@@ -52,7 +51,8 @@
     find: 37682 combs
     time: 5147ms
 
-Работа функции на отсортированном входном масиве:
+Работа функции на отсортированном входном масиве
+(вернет все возможные комбинации считая повторы отдельными элементами):
 
     data: [-5,-5,-4,-4,-3,-3,-2,-2,-1,-1,0,0,1,1,2,2,3,3,4,4,5,5]
     find: 93836 combs
@@ -64,13 +64,15 @@
     find: 26 combs
     time: 4ms
 
-Работа функции на отсортированном и уникализированном входном масиве:
+Работа функции на отсортированном и уникализированном входном масиве
+(вернет все возможные комбинации исключая повторы):
 
     data: [-5,-4,-3,-2,-1,0,1,2,3,4,5]
     find: 28 combs
     time: 3ms
 
-Работа функции на отсортированном в обратном порядке и уникализированном входном масиве:
+Работа функции на отсортированном в обратном порядке и уникализированном входном масиве
+(вернет все возможные комбинации только из положительных чисел исключая повторы):
 
     data: [5,4,3,2,1,0,-1,-2,-3,-4,-5]
     find: 3 combs
